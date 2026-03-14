@@ -2,9 +2,16 @@
 
 set -e
 
-echo "Starting system..."
+echo "Starting Forti-Tailscale Exit Node..."
 
+# enable forwarding
 sysctl -w net.ipv4.ip_forward=1
+
+# ensure PPP device exists
+if [ ! -e /dev/ppp ]; then
+  echo "Creating /dev/ppp device"
+  mknod /dev/ppp c 108 0 || true
+fi
 
 #################################
 # Generate FortiVPN config
@@ -21,22 +28,31 @@ pppd-use-peerdns = 1
 EOF
 
 #################################
-# Start Tailscale
+# Start tailscaled
 #################################
 
 echo "Starting tailscaled..."
 
-tailscaled --state=/tmp/tailscale.state &
+mkdir -p /var/lib/tailscale
 
-sleep 3
+tailscaled \
+ --state=/var/lib/tailscale/tailscaled.state \
+ --socket=/run/tailscale/tailscaled.sock &
+
+sleep 5
+
+echo "Connecting to Tailscale..."
 
 tailscale up \
   --authkey=${TAILSCALE_AUTHKEY} \
-  --hostname=${TAILSCALE_HOSTNAME} \
-  --advertise-exit-node
+  --hostname=${TAILSCALE_HOSTNAME:-forti-exit-node} \
+  --advertise-exit-node \
+  --ssh \
+  --accept-dns=false \
+  --accept-routes=true
 
 #################################
-# Start VPN Monitor
+# Start VPN monitor
 #################################
 
 echo "Starting VPN monitor..."

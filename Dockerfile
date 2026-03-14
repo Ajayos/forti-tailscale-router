@@ -11,9 +11,10 @@ RUN apt-get update && apt-get install -y \
     python3 \
     procps \
     ca-certificates \
+    ppp \
     && rm -rf /var/lib/apt/lists/*
 
-# install tailscale
+# Install Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
 WORKDIR /app
@@ -24,5 +25,7 @@ COPY dashboard.py /dashboard.py
 
 RUN chmod +x /entrypoint.sh
 RUN chmod +x /vpn-monitor.sh
+
+EXPOSE 8080
 
 ENTRYPOINT ["/entrypoint.sh"]

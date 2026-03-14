@@ -1,11 +1,11 @@
-# Forti-Tailscale Exit Node
+# Forti-Tailscale Router
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/tailscale/tailscale/main/docs/static/images/tailscale-logo.svg" width="120"/>
 
 <h3>FortiGate VPN → Docker → Tailscale Exit Node</h3>
 
-A lightweight Docker container that connects to a **FortiGate SSL VPN** and exposes the connection as a **Tailscale Exit Node**, allowing devices in your tailnet to route traffic through the VPN securely.
+A lightweight container that connects to a **FortiGate SSL VPN** and exposes the connection as a **Tailscale Exit Node**, allowing devices in your tailnet to securely route traffic through the VPN.
 
 </p>
 
@@ -13,11 +13,19 @@ A lightweight Docker container that connects to a **FortiGate SSL VPN** and expo
 
 # Overview
 
-**Forti-Tailscale Exit Node** is a containerized gateway that bridges **FortiGate SSL VPN** and **Tailscale**.
+**Forti-Tailscale Router** is a containerized gateway that bridges **FortiGate SSL VPN** and **Tailscale**.
 
-Instead of advertising internal routes, the container operates as a **Tailscale Exit Node**, allowing tailnet devices to route their traffic through the FortiGate VPN tunnel.
+Instead of advertising internal subnets, the container operates as a **Tailscale Exit Node**, allowing tailnet devices to send their traffic through the FortiGate VPN tunnel.
 
 This enables secure access to the internet or corporate resources through the VPN from anywhere in your tailnet.
+
+The container image is published on **Quay** and can be pulled directly.
+
+Image repository:
+
+```
+https://quay.io/repository/ajayos/forti-tailscale-router
+```
 
 ---
 
@@ -30,14 +38,14 @@ Tailnet Devices
 Tailscale Network
       │
       │
-┌──────────────────────────┐
-│   Forti-Tailscale Router │
-│                          │
-│  tailscaled              │
-│  openfortivpn            │
-│  vpn monitor             │
-│  dashboard               │
-└──────────────────────────┘
+┌─────────────────────────────┐
+│   Forti-Tailscale Router    │
+│                             │
+│   tailscaled                │
+│   openfortivpn              │
+│   vpn-monitor               │
+│   dashboard                 │
+└─────────────────────────────┘
       │
       │
 FortiGate SSL VPN
@@ -48,17 +56,36 @@ Internet / Corporate Network
 
 ---
 
+# Container Image
+
+The container image is hosted on **Quay**.
+
+Pull the image:
+
+```bash
+docker pull quay.io/ajayos/forti-tailscale-router:latest
+```
+
+Repository:
+
+```
+quay.io/ajayos/forti-tailscale-router
+```
+
+---
+
 # Features
 
-• FortiGate SSL VPN support via `openfortivpn`
+• FortiGate SSL VPN support using `openfortivpn`
 • Tailscale integration
 • Runs as a **Tailscale Exit Node**
 • Automatic VPN reconnect
-• Built-in health checks
+• Tailscale SSH support
 • Web dashboard for monitoring
 • Docker-based deployment
-• Environment-variable configuration
-• Secure remote access through VPN
+• Environment variable configuration
+• Tailnet peer monitoring
+• Live VPN traffic visualization
 
 ---
 
@@ -69,20 +96,7 @@ Internet / Corporate Network
 • Private infrastructure access
 • DevOps internal networking
 • Homelab VPN gateway
-
----
-
-# Project Structure
-
-```
-forti-tailscale-exit-node
-│
-├── Dockerfile
-├── entrypoint.sh
-├── vpn-monitor.sh
-├── dashboard.py
-└── README.md
-```
+• Secure remote browsing through VPN
 
 ---
 
@@ -92,8 +106,8 @@ Before running the container ensure you have:
 
 • Docker installed
 • A FortiGate VPN account
-• Tailscale account
-• Tailscale authentication key
+• A Tailscale account
+• A Tailscale authentication key
 
 Install Docker:
 
@@ -101,7 +115,7 @@ Install Docker:
 https://docs.docker.com/get-docker/
 ```
 
-Generate Tailscale auth key:
+Generate a Tailscale auth key:
 
 ```
 https://login.tailscale.com/admin/settings/keys
@@ -109,32 +123,20 @@ https://login.tailscale.com/admin/settings/keys
 
 ---
 
-# Build Docker Image
-
-Clone the repository:
-
-```bash
-git clone https://github.com/ajayos/forti-tailscale-exit-node.git
-cd forti-tailscale-exit-node
-```
-
-Build the image:
-
-```bash
-docker build -t forti-tailscale-exit-node .
-```
-
----
-
 # Run Container
+
+Pull and run the container directly from **Quay**.
 
 Example deployment:
 
 ```bash
 docker run -d \
---name forti-exit-node \
+--name forti-tailscale-router \
 --cap-add=NET_ADMIN \
 --device /dev/net/tun \
+--device /dev/ppp \
+--privileged \
+-v tailscale-state:/var/lib/tailscale \
 -p 8080:8080 \
 -e FORTI_HOST=1.2.3.4 \
 -e FORTI_PORT=443 \
@@ -143,23 +145,23 @@ docker run -d \
 -e FORTI_CERT=abcdef123456 \
 -e TAILSCALE_AUTHKEY=tskey-xxxxxxxx \
 -e TAILSCALE_HOSTNAME=forti-exit-node \
-forti-tailscale-exit-node
+quay.io/ajayos/forti-tailscale-router:latest
 ```
 
 ---
 
 # Configuration
 
-The container is configured entirely through **environment variables**.
+The container is configured entirely using **environment variables**.
 
 | Variable           | Description                               |
 | ------------------ | ----------------------------------------- |
 | FORTI_HOST         | FortiGate VPN hostname or IP              |
-| FORTI_PORT         | VPN port (default 443)                    |
+| FORTI_PORT         | VPN port (usually 443)                    |
 | FORTI_USERNAME     | VPN login username                        |
 | FORTI_PASSWORD     | VPN password                              |
 | FORTI_CERT         | FortiGate trusted certificate fingerprint |
-| TAILSCALE_AUTHKEY  | Tailscale auth key                        |
+| TAILSCALE_AUTHKEY  | Tailscale authentication key              |
 | TAILSCALE_HOSTNAME | Node hostname in tailnet                  |
 
 Example configuration:
@@ -176,7 +178,7 @@ TAILSCALE_HOSTNAME=forti-exit-node
 
 ---
 
-# Enable Exit Node (Client)
+# Enable Exit Node
 
 Once the container is running, enable the exit node from your device.
 
@@ -186,9 +188,9 @@ Using CLI:
 tailscale up --exit-node=forti-exit-node
 ```
 
-Or enable it from the **Tailscale Admin Console**.
+Or enable it through the **Tailscale Admin Console**.
 
-After enabling, your device traffic flows through:
+Traffic path becomes:
 
 ```
 Device → Tailnet → Exit Node → FortiGate VPN
@@ -198,68 +200,49 @@ Device → Tailnet → Exit Node → FortiGate VPN
 
 # Dashboard
 
-A simple monitoring dashboard is available.
+A built-in monitoring dashboard is available.
 
-Open:
+Open in your browser:
 
 ```
 http://SERVER_IP:8080
 ```
 
-Dashboard shows:
+Dashboard displays:
 
 • VPN connection status
-• Tailscale status
+• Tailscale peer list
+• Tailnet device status
+• VPN traffic graph
 • system information
-
----
-
-# Health Checks
-
-Docker health monitoring is included.
-
-Check container health:
-
-```
-docker ps
-```
-
-Example output:
-
-```
-forti-exit-node   healthy
-```
-
-If the VPN drops, the container automatically reconnects.
 
 ---
 
 # Logs
 
-View runtime logs:
+View runtime logs with:
 
 ```bash
-docker logs forti-exit-node
+docker logs forti-tailscale-router
 ```
 
 Logs include:
 
-• VPN reconnect attempts
-• connection status
-• tailscale events
-• system logs
+• VPN connection attempts
+• auto reconnect events
+• tailscale network status
+• dashboard activity
 
 ---
-
 
 # Troubleshooting
 
 ### VPN Not Connecting
 
-Check logs:
+Check container logs:
 
 ```
-docker logs forti-exit-node
+docker logs forti-tailscale-router
 ```
 
 Verify:
@@ -272,13 +255,13 @@ Verify:
 
 ### Tailscale Not Connecting
 
-Verify auth key:
+Verify the auth key:
 
 ```
 TAILSCALE_AUTHKEY
 ```
 
-Ensure the device appears in:
+Ensure the node appears in:
 
 ```
 https://login.tailscale.com/admin/machines
@@ -286,16 +269,29 @@ https://login.tailscale.com/admin/machines
 
 ---
 
+# Security Notes
+
+Do **not commit VPN credentials** to source control.
+
+Recommended practices:
+
+• Use environment variables
+• Use Docker secrets in production
+• Rotate Tailscale auth keys regularly
+• Restrict dashboard port access
+
+---
+
 # Contributing
 
 Pull requests and improvements are welcome.
 
-Areas where contributions are appreciated:
+Possible areas of improvement:
 
-• improved monitoring
-• better dashboard UI
-• configuration management
-• networking optimizations
+• enhanced dashboard UI
+• advanced network monitoring
+• better traffic metrics
+• multi-VPN configuration
 
 ---
 
@@ -313,6 +309,16 @@ Website:
 
 ```
 https://ajayos.com
+```
+
+---
+
+# Container Registry
+
+Image hosted on **Quay Container Registry**:
+
+```
+https://quay.io/repository/ajayos/forti-tailscale-router
 ```
 
 ---
