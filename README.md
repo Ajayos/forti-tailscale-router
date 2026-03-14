@@ -1,7 +1,7 @@
 # Forti-Tailscale Router
 
 <p align="center">
-<img src="./logo.png" width="120"/>
+<img src="./logo.png" />
 
 <h3>FortiGate VPN → Docker → Tailscale Exit Node</h3>
 

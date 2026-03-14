@@ -60,6 +60,16 @@ echo "Starting VPN monitor..."
 /vpn-monitor.sh &
 
 #################################
+# Enable routing between Tailscale and VPN
+#################################
+
+echo "Configuring routing..."
+
+iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE || true
+iptables -A FORWARD -i tailscale0 -o ppp0 -j ACCEPT || true
+iptables -A FORWARD -i ppp0 -o tailscale0 -m state --state RELATED,ESTABLISHED -j ACCEPT || true
+
+#################################
 # Start dashboard
 #################################
 
