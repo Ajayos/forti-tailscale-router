@@ -12,10 +12,12 @@ RUN apt-get update && apt-get install -y \
     procps \
     ca-certificates \
     nano \
+    cowsay \
+    lolcat \
+    figlet \
     ppp \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Tailscale
 RUN curl -fsSL https://tailscale.com/install.sh | sh
 
 WORKDIR /app
@@ -32,6 +34,11 @@ RUN chmod +x /entrypoint.sh \
 
 RUN cp /usr/local/bin/banner.sh /etc/profile.d/banner.sh \
  && chmod +x /etc/profile.d/banner.sh
+
+RUN rm -f /etc/motd \
+ && rm -f /etc/legal \
+ && sed -i 's/^PrintMotd yes/PrintMotd no/' /etc/ssh/sshd_config || true \
+ && sed -i 's/^PrintLastLog yes/PrintLastLog no/' /etc/ssh/sshd_config || true
 
 EXPOSE 8080
 

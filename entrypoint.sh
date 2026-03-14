@@ -3,6 +3,7 @@
 set -e
 
 echo "Starting system..."
+hostname ${TAILSCALE_HOSTNAME:-forti-router}
 
 cat <<EOF > /etc/resolv.conf
 nameserver 8.8.8.8
