@@ -2,9 +2,15 @@
 
 set -e
 
-echo "Starting Forti-Tailscale Exit Node..."
+echo "Starting system..."
 
-# enable forwarding
+cat <<EOF > /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+nameserver 1.1.1.1
+nameserver 1.0.0.1
+EOF
+
 sysctl -w net.ipv4.ip_forward=1
 
 # ensure PPP device exists

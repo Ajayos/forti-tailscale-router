@@ -45,7 +45,7 @@ class Handler(BaseHTTPRequestHandler):
             data = {
                 "vpn": get_vpn_status(),
                 "peers": get_peers(),
-                "traffic": random.randint(10,120)
+                "traffic": random.randint(20,120)
             }
 
             self.send_response(200)
@@ -62,14 +62,14 @@ class Handler(BaseHTTPRequestHandler):
 
         for p in peers:
 
-            color = "bg-green-500" if p["online"] else "bg-red-500"
+            color = "bg-emerald-500" if p["online"] else "bg-red-500"
 
             rows += f"""
-<tr class="border-b border-slate-700">
-<td class="p-2">{p['name']}</td>
-<td class="p-2">{p['ip']}</td>
-<td class="p-2">
-<span class="px-2 py-1 rounded {color}">
+<tr class="border-b border-slate-700 hover:bg-slate-700/40">
+<td class="p-3">{p['name']}</td>
+<td class="p-3 font-mono">{p['ip']}</td>
+<td class="p-3">
+<span class="px-3 py-1 text-sm rounded-full text-white {color}">
 {"Online" if p["online"] else "Offline"}
 </span>
 </td>
@@ -77,64 +77,87 @@ class Handler(BaseHTTPRequestHandler):
 """
 
 
+        status_color = "text-emerald-400" if vpn == "Connected" else "text-red-400"
+
         html = f"""
 <!DOCTYPE html>
 <html>
 <head>
 
-<title>Forti Tailscale Dashboard</title>
+<title>Forti-Tailscale Router</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
 
-<body class="bg-slate-900 text-white">
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
 
-<div class="p-8 max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto p-8">
 
-<h1 class="text-3xl font-bold mb-8">
-Forti-Tailscale Exit Node
+<div class="flex items-center justify-between mb-10">
+
+<h1 class="text-3xl font-bold tracking-tight">
+Forti-Tailscale Router
 </h1>
 
-<div class="grid grid-cols-3 gap-6">
-
-<div class="bg-slate-800 p-5 rounded-xl">
-<h2 class="text-lg">VPN Status</h2>
-<p id="vpn" class="text-2xl font-bold">{vpn}</p>
-</div>
-
-<div class="bg-slate-800 p-5 rounded-xl">
-<h2 class="text-lg">Peers</h2>
-<p class="text-2xl">{len(peers)}</p>
-</div>
-
-<div class="bg-slate-800 p-5 rounded-xl">
-<h2 class="text-lg">Server Time</h2>
-<p>{time.ctime()}</p>
-</div>
+<span class="text-sm text-slate-400">
+{time.ctime()}
+</span>
 
 </div>
 
-<div class="mt-10 bg-slate-800 p-6 rounded-xl">
 
-<h2 class="text-xl mb-4">VPN Traffic</h2>
+<div class="grid md:grid-cols-3 gap-6 mb-10">
 
-<canvas id="trafficChart"></canvas>
+<div class="bg-slate-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl">
+<h2 class="text-slate-400 text-sm mb-2">VPN Status</h2>
+<p id="vpn" class="text-3xl font-bold {status_color}">
+{vpn}
+</p>
+</div>
+
+
+<div class="bg-slate-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl">
+<h2 class="text-slate-400 text-sm mb-2">Connected Peers</h2>
+<p class="text-3xl font-bold">{len(peers)}</p>
+</div>
+
+
+<div class="bg-slate-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl">
+<h2 class="text-slate-400 text-sm mb-2">Router Time</h2>
+<p class="text-lg">{time.ctime()}</p>
+</div>
 
 </div>
 
-<div class="mt-10 bg-slate-800 p-6 rounded-xl">
 
-<h2 class="text-xl mb-4">Tailnet Peers</h2>
+<div class="bg-slate-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl mb-10">
 
-<table class="w-full text-left">
+<h2 class="text-xl font-semibold mb-4">
+VPN Traffic
+</h2>
 
-<thead>
+<canvas id="trafficChart" height="90"></canvas>
+
+</div>
+
+
+<div class="bg-slate-800/60 backdrop-blur p-6 rounded-2xl border border-slate-700 shadow-xl">
+
+<h2 class="text-xl font-semibold mb-6">
+Tailnet Devices
+</h2>
+
+<div class="overflow-x-auto">
+
+<table class="w-full text-left text-sm">
+
+<thead class="text-slate-400 border-b border-slate-700">
 <tr>
-<th class="p-2">Hostname</th>
-<th class="p-2">IP</th>
-<th class="p-2">Status</th>
+<th class="p-3">Hostname</th>
+<th class="p-3">IP Address</th>
+<th class="p-3">Status</th>
 </tr>
 </thead>
 
@@ -150,29 +173,59 @@ Forti-Tailscale Exit Node
 
 </div>
 
+
+<div class="text-center text-slate-500 text-xs mt-10">
+Forti-Tailscale Router Dashboard
+</div>
+
+</div>
+
+
+
 <script>
 
 const ctx = document.getElementById("trafficChart");
 
 const chart = new Chart(ctx, {{
 type:"line",
-data:{{labels:[],datasets:[{{label:"Traffic",data:[],borderColor:"rgb(59,130,246)"}}]}},
-options:{{responsive:true}}
+data:{{
+labels:[],
+datasets:[{{
+label:"VPN Traffic",
+data:[],
+borderColor:"#22c55e",
+backgroundColor:"rgba(34,197,94,0.2)",
+tension:0.35,
+fill:true
+}}]
+}},
+options:{{
+responsive:true,
+plugins:{{
+legend:{{display:false}}
+}},
+scales:{{
+x:{{grid:{{display:false}}}},
+y:{{grid:{{color:"#334155"}}}}
+}}
+}}
 }});
 
+
 function update(){{
+
 fetch("/api/status")
 .then(r=>r.json())
 .then(d=>{{
 
-document.getElementById("vpn").innerText=d.vpn;
+document.getElementById("vpn").innerText = d.vpn
 
-let t=new Date().toLocaleTimeString()
+let now = new Date().toLocaleTimeString()
 
-chart.data.labels.push(t)
+chart.data.labels.push(now)
 chart.data.datasets[0].data.push(d.traffic)
 
-if(chart.data.labels.length>20){{
+if(chart.data.labels.length>25){{
 chart.data.labels.shift()
 chart.data.datasets[0].data.shift()
 }}

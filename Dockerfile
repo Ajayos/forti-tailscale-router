@@ -30,9 +30,8 @@ RUN chmod +x /entrypoint.sh \
  && chmod +x /usr/local/bin/banner.sh \
  && chmod -x /etc/update-motd.d/*
 
-RUN echo "/usr/local/bin/banner.sh" >> /etc/bash.bashrc
-
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+RUN cp /usr/local/bin/banner.sh /etc/profile.d/banner.sh \
+ && chmod +x /etc/profile.d/banner.sh
 
 EXPOSE 8080
 

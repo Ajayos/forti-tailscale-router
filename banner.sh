@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ -z "$PS1" ] && return
+
 RED="\e[31m"
 GREEN="\e[32m"
 CYAN="\e[36m"
