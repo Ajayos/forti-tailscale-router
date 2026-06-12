@@ -7,7 +7,6 @@ services:
     privileged: true
     cap_add:
       - NET_ADMIN
-    cpu_shares: 50
     deploy:
       resources:
         limits:

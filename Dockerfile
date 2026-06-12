@@ -1,6 +1,7 @@
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games"
 
 RUN apt-get update && apt-get install -y \
     curl \
@@ -11,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     nodejs \
     npm \
     procps \
+    psmisc \
     ca-certificates \
     nano \
     cowsay \
