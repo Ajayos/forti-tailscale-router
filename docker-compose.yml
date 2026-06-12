@@ -1,18 +1,49 @@
-version: '3.8'
-
+name: forti-tailscale-gateway
 services:
-  forti-router:
-    build: .
+  main_app:
+    image: quay.io/ajayos/forti-tailscale-router:latest
     container_name: forti-tailscale-router
+    hostname: forti-gateway
     privileged: true
-    network_mode: "host"
     cap_add:
       - NET_ADMIN
+    cpu_shares: 50
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     devices:
+      - /dev/net/tun:/dev/net/tun
       - /dev/ppp:/dev/ppp
+    environment:
+      - FORTI_HOST=your_fortigate_ip
+      - FORTI_PORT=443
+      - FORTI_USERNAME=your_username
+      - FORTI_PASSWORD=your_password
+      - FORTI_CERT=your_trusted_cert_hash
+      - TAILSCALE_AUTHKEY=tskey-auth-XXXXX
+      - TAILSCALE_HOSTNAME=forti-gateway
+      - TAILSCALE_SUBNETS=10.0.0.0/8,192.168.0.0/16
     volumes:
       - tailscale_data:/var/lib/tailscale
-    restart: unless-stopped
+    restart: always
+    network_mode: bridge
+    labels:
+      icon: https://github.com/Ajayos/forti-tailscale-router/blob/master/logo.png?raw=true
 
 volumes:
   tailscale_data:
+
+x-casaos:
+  author: Ajayos
+  category: Networking
+  hostname: forti-gateway
+  icon: https://github.com/Ajayos/forti-tailscale-router/blob/master/logo.png?raw=true
+  index: /
+  is_uncontrolled: false
+  scheme: http
+  store_app_id: forti_tailscale_router
+  title:
+    custom: Forti-Tailscale Router
+  description:
+    en_us: A lightweight container that connects to a FortiGate SSL VPN and exposes the connection as a Tailscale Exit Node or Subnet Router.
