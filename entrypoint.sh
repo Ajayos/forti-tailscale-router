@@ -112,6 +112,6 @@ iptables -A FORWARD -i ppp0 -o tailscale0 -m state --state RELATED,ESTABLISHED -
 
 echo "Starting web dashboard..." | lolcat || echo "Starting web dashboard..."
 
-node /server.js &
+node /app/server.js &
 
 wait

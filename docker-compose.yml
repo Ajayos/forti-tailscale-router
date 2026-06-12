@@ -24,6 +24,7 @@ services:
       - TAILSCALE_AUTHKEY=tskey-auth-XXXXX
       - TAILSCALE_HOSTNAME=forti-gateway
       - TAILSCALE_SUBNETS=10.0.0.0/8,192.168.0.0/16
+      - TAILSCALE_TAGS=tag:gateway
     volumes:
       - tailscale_data:/var/lib/tailscale
     restart: always

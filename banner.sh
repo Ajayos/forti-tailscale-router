@@ -40,10 +40,10 @@ TSIP=$(tailscale ip -4 2>/dev/null)
 
 if [ -n "$TSIP" ]; then
     echo -e "${CYAN}║${RESET} ${MAGENTA}Tailscale IP:${RESET} $TSIP"
-    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://$TSIP:8080"
+    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://$TSIP"
 else
     echo -e "${CYAN}║${RESET} ${RED}Tailscale:${RESET}    Not Connected"
-    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://<host-ip>:8080"
+    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://<host-ip>"
 fi
 
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════╝${RESET}"

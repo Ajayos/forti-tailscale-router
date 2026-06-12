@@ -28,7 +28,7 @@ RUN npm install
 
 COPY entrypoint.sh /entrypoint.sh
 COPY vpn-monitor.sh /vpn-monitor.sh
-COPY server.js /server.js
+COPY server.js /app/server.js
 COPY banner.sh /usr/local/bin/banner.sh
 COPY public /app/public
 
