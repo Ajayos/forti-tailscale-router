@@ -2,8 +2,14 @@
 
 set -e
 
-echo "Starting system..."
+# Terminal aesthetics loading
+echo "Starting system..." | lolcat -a -d 2 || echo "Starting system..."
+figlet "Forti-Router" | lolcat || echo "Forti-Router"
+
 hostname ${TAILSCALE_HOSTNAME:-forti-router}
+
+echo "Checking for Tailscale updates..."
+tailscale update --yes || echo "Tailscale update check failed, proceeding..."
 
 cat <<EOF > /etc/resolv.conf
 nameserver 8.8.8.8
@@ -18,6 +24,14 @@ sysctl -w net.ipv4.ip_forward=1
 if [ ! -e /dev/ppp ]; then
   echo "Creating /dev/ppp device"
   mknod /dev/ppp c 108 0 || true
+fi
+
+# SSH Passwordless Support
+if [ -n "$SSH_PUBLIC_KEY" ]; then
+  echo "Configuring SSH Authorized Keys..."
+  mkdir -p /root/.ssh
+  echo "$SSH_PUBLIC_KEY" >> /root/.ssh/authorized_keys
+  chmod 600 /root/.ssh/authorized_keys
 fi
 
 #################################
@@ -50,13 +64,29 @@ sleep 5
 
 echo "Connecting to Tailscale..."
 
-tailscale up \
-  --authkey=${TAILSCALE_AUTHKEY} \
-  --hostname=${TAILSCALE_HOSTNAME:-forti-exit-node} \
-  --advertise-exit-node \
-  --ssh \
-  --accept-dns=false \
-  --accept-routes=true
+# Build Tailscale arguments dynamically
+TS_ARGS="--hostname=${TAILSCALE_HOSTNAME:-forti-exit-node} --advertise-exit-node --accept-dns=false --accept-routes"
+
+if [ -n "$TAILSCALE_SUBNETS" ]; then
+    TS_ARGS="$TS_ARGS --advertise-routes=$TAILSCALE_SUBNETS"
+fi
+
+if [ -n "$TAILSCALE_TAGS" ]; then
+    TS_ARGS="$TS_ARGS --advertise-tags=$TAILSCALE_TAGS"
+fi
+
+if [ "${TAILSCALE_SSH:-true}" = "true" ]; then
+    TS_ARGS="$TS_ARGS --ssh"
+fi
+
+# Check if state exists to avoid requiring authkey on restart
+if [ -f "/var/lib/tailscale/tailscaled.state" ] && [ -s "/var/lib/tailscale/tailscaled.state" ]; then
+    echo "Restoring existing Tailscale connection..."
+    tailscale up $TS_ARGS || tailscale up --authkey=${TAILSCALE_AUTHKEY} $TS_ARGS
+else
+    echo "Initial Tailscale connection..."
+    tailscale up --authkey=${TAILSCALE_AUTHKEY} $TS_ARGS
+fi
 
 #################################
 # Start VPN monitor
@@ -80,8 +110,8 @@ iptables -A FORWARD -i ppp0 -o tailscale0 -m state --state RELATED,ESTABLISHED -
 # Start dashboard
 #################################
 
-echo "Starting dashboard..."
+echo "Starting web dashboard..." | lolcat || echo "Starting web dashboard..."
 
-python3 /dashboard.py &
+node /server.js &
 
 wait

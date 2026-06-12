@@ -1,3 +1,10 @@
+FROM node:20 AS build
+WORKDIR /app/web
+COPY web/package*.json ./
+RUN npm install
+COPY web/ ./
+RUN npm run build
+
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -8,7 +15,8 @@ RUN apt-get update && apt-get install -y \
     iputils-ping \
     iptables \
     openfortivpn \
-    python3 \
+    nodejs \
+    npm \
     procps \
     ca-certificates \
     nano \
@@ -22,10 +30,14 @@ RUN curl -fsSL https://tailscale.com/install.sh | sh
 
 WORKDIR /app
 
+COPY package*.json ./
+RUN npm install
+
 COPY entrypoint.sh /entrypoint.sh
 COPY vpn-monitor.sh /vpn-monitor.sh
-COPY dashboard.py /dashboard.py
+COPY server.js /server.js
 COPY banner.sh /usr/local/bin/banner.sh
+COPY --from=build /app/web/dist /app/web/dist
 
 RUN chmod +x /entrypoint.sh \
  && chmod +x /vpn-monitor.sh \
@@ -40,6 +52,6 @@ RUN rm -f /etc/motd \
  && sed -i 's/^PrintMotd yes/PrintMotd no/' /etc/ssh/sshd_config || true \
  && sed -i 's/^PrintLastLog yes/PrintLastLog no/' /etc/ssh/sshd_config || true
 
-EXPOSE 8080
+EXPOSE 80 443
 
 ENTRYPOINT ["/entrypoint.sh"]

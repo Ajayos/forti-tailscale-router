@@ -9,33 +9,44 @@ YELLOW="\e[33m"
 MAGENTA="\e[35m"
 RESET="\e[0m"
 
+clear
 echo ""
-figlet "AOS" | lolcat
+echo "🚀 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 🚀" | lolcat
 echo ""
-cowsay -f tux "Forti-Tailscale Router Exit Node" | lolcat
+figlet -f slant " Forti-Tailscale " | lolcat
+figlet -f slant "     Router      " | lolcat
 echo ""
-echo -e "${CYAN}┌──────────────────────────────────────────┐"
-echo -e "│        Forti-Tailscale Router Node       │"
-echo -e "└──────────────────────────────────────────┘${RESET}"
+echo "🚀 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 🚀" | lolcat
 echo ""
-echo -e "${YELLOW}Hostname:${RESET} $(hostname)"
-echo -e "${YELLOW}Uptime:${RESET} $(uptime -p)"
+
+cowsay -f dragon "Welcome to the Forti-Tailscale Gateway Terminal" | lolcat
+echo ""
+
+echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════╗${RESET}"
+echo -e "${CYAN}║${RESET} ${YELLOW}Hostname:${RESET}     $(hostname)"
+echo -e "${CYAN}║${RESET} ${YELLOW}Uptime:${RESET}       $(uptime -p)"
 
 if ip addr | grep -q ppp0; then
-    echo -e "${GREEN}VPN Status:${RESET} Connected"
+    echo -e "${CYAN}║${RESET} ${GREEN}VPN Status:${RESET}   Connected (ppp0 active)"
 else
-    echo -e "${RED}VPN Status:${RESET} Disconnected"
+    if [ -f "/tmp/vpn_stopped" ]; then
+        echo -e "${CYAN}║${RESET} ${RED}VPN Status:${RESET}   Stopped (Manually Disabled)"
+    else
+        echo -e "${CYAN}║${RESET} ${RED}VPN Status:${RESET}   Disconnected (Reconnecting...)"
+    fi
 fi
 
 TSIP=$(tailscale ip -4 2>/dev/null)
 
 if [ -n "$TSIP" ]; then
-    echo -e "${MAGENTA}Tailscale IP:${RESET} $TSIP"
+    echo -e "${CYAN}║${RESET} ${MAGENTA}Tailscale IP:${RESET} $TSIP"
+    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://$TSIP:8080"
 else
-    echo -e "${RED}Tailscale:${RESET} Not Connected"
+    echo -e "${CYAN}║${RESET} ${RED}Tailscale:${RESET}    Not Connected"
+    echo -e "${CYAN}║${RESET} ${GREEN}Web UI:${RESET}       http://<host-ip>:8080"
 fi
+
+echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════╝${RESET}"
 echo ""
-echo -e "${CYAN}Dashboard:${RESET} http://$TSIP:8080"
-echo ""
-echo "════════════════════════════════════════════" | lolcat
+echo "Type 'tailscale status' to see peers, or visit the Web UI for configuration."
 echo ""

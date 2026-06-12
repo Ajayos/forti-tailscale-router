@@ -1,0 +1,10 @@
+{
+  "name": "forti-tailscale-router-backend",
+  "version": "1.0.0",
+  "description": "Backend for Forti-Tailscale Router",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
