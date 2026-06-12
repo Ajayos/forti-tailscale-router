@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import Sidebar from './components/Sidebar';
+import AosWidgets from './components/AosWidgets';
 import Dashboard from './pages/Dashboard';
-import ConfigPage from './pages/ConfigPage';
-import SystemPage from './pages/SystemPage';
 
 const socket = io();
 
@@ -18,9 +16,7 @@ export default function App() {
       setData(metricsData);
       
       const now = new Date(metricsData.timestamp);
-      const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
-                      now.getMinutes().toString().padStart(2, '0') + ':' + 
-                      now.getSeconds().toString().padStart(2, '0');
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       
       setHistory(prev => {
         const next = [...prev, {
@@ -32,36 +28,36 @@ export default function App() {
         if (next.length > 30) return next.slice(next.length - 30);
         return next;
       });
-      
+
       setLoading(false);
     });
-
-    return () => {
-      socket.off('metrics');
-    };
+    return () => socket.off('metrics');
   }, []);
 
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen animated-bg bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 text-white font-sans overflow-hidden">
-        <Sidebar />
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard data={data} history={history} />} />
-            <Route path="/config" element={<ConfigPage />} />
-            <Route path="/system" element={<SystemPage data={data} uptimes={data.uptimes} />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
+      <div className="flex flex-col min-h-screen aura-wallpaper font-sans overflow-hidden relative">
+        <main className="flex-1 flex flex-col md:flex-row px-4 md:px-8 py-4 md:py-6 gap-6 md:gap-10 overflow-y-auto mt-4">
+          <AosWidgets data={data} />
+          
+          <div className="flex-1">
+             <Routes>
+                <Route path="/dashboard" element={<Dashboard data={data} history={history} />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+             </Routes>
+          </div>
         </main>
       </div>
     </BrowserRouter>
   );
 }
+
+

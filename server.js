@@ -310,7 +310,7 @@ setInterval(() => {
     });
 }, 2000);
 
-const LISTENING_PORT = isWin ? 8080 : HTTP_PORT; // Use 8080 for HTTP dev on Windows, 80 for production Docker
+const LISTENING_PORT = isWin ? 8080 : HTTP_PORT; // Use 8080 for HTTP dev on Windows (Port 80 blocked), 80 for production Docker
 
 httpServer.listen(LISTENING_PORT, '0.0.0.0', () => {
     console.log(`HTTP server running on port ${LISTENING_PORT} ${httpsServer ? '(Redirecting to HTTPS)' : ''}`);

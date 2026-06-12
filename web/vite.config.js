@@ -6,6 +6,19 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: '../public',
-    emptyOutDir: true
+    emptyOutDir: true,
+    sourcemap: false
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:80',
+        changeOrigin: true
+      },
+      '/socket.io': {
+        target: 'http://localhost:80',
+        ws: true
+      }
+    }
   }
 })
