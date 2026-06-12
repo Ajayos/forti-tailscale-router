@@ -1,0 +1,9 @@
+node_modules/
+web/node_modules/
+.env
+web/dist/
+.DS_Store
+vpn_stopped.flag
+config.json
+server.crt
+server.key

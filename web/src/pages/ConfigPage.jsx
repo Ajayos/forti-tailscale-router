@@ -29,53 +29,53 @@ export default function ConfigPage() {
   if (!config) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
-      <div className="p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
-        <h2 className="text-2xl font-bold text-white mb-2">Configuration</h2>
-        <p className="text-slate-400 mb-8">Update VPN credentials, Tailscale arguments, and ping targets. Settings are saved persistently.</p>
-        
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 mb-8">Gateway Configuration</h2>
+      
+      <div className="glass-card p-8">
         <form onSubmit={handleSave} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">FortiGate Host</label>
-              <input type="text" name="fortiHost" value={config.fortiHost} onChange={handleChange} className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required/>
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-indigo-300 mb-2">FortiGate Host</label>
+              <input type="text" className="input-glass" value={config.fortiHost} onChange={e => setConfig({...config, fortiHost: e.target.value})} placeholder="vpn.company.com" />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Port</label>
-              <input type="text" name="fortiPort" value={config.fortiPort} onChange={handleChange} className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required/>
+            <div>
+              <label className="block text-sm font-medium text-indigo-300 mb-2">Port</label>
+              <input type="text" className="input-glass" value={config.fortiPort} onChange={e => setConfig({...config, fortiPort: e.target.value})} placeholder="443" />
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Username</label>
-              <input type="text" name="fortiUser" value={config.fortiUser} onChange={handleChange} className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required/>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Password</label>
-              <input type="password" name="fortiPass" value={config.fortiPass} onChange={handleChange} className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required/>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-slate-300">Trusted Cert (Optional)</label>
-              <input type="text" name="fortiCert" value={config.fortiCert} onChange={handleChange} className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
-            </div>
-
-            <div className="space-y-2 md:col-span-2 border-t border-white/10 pt-6 mt-2">
-              <label className="text-sm font-medium text-slate-300">Tailscale Subnets (comma separated)</label>
-              <input type="text" name="tailscaleSubnets" value={config.tailscaleSubnets} onChange={handleChange} placeholder="10.0.0.0/8, 192.168.1.0/24" className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-slate-300">Ping Monitor Target</label>
-              <input type="text" name="pingTarget" value={config.pingTarget} onChange={handleChange} placeholder="8.8.8.8" className="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all" />
-              <p className="text-xs text-slate-500">The IP address to actively ping to verify VPN health.</p>
-            </div>
-
           </div>
 
-          <div className="pt-4 flex justify-end">
-            <button disabled={saving} type="submit" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all flex items-center gap-2 font-medium shadow-lg shadow-indigo-600/20 active:scale-95 disabled:opacity-50">
-              <Save className="w-5 h-5"/> {saving ? 'Saving...' : 'Save Configuration'}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-indigo-300 mb-2">Username</label>
+              <input type="text" className="input-glass" value={config.fortiUser} onChange={e => setConfig({...config, fortiUser: e.target.value})} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-indigo-300 mb-2">Password</label>
+              <input type="password" className="input-glass" value={config.fortiPass} onChange={e => setConfig({...config, fortiPass: e.target.value})} />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-indigo-300 mb-2">Trusted Certificate (Optional)</label>
+            <input type="text" className="input-glass" value={config.fortiCert} onChange={e => setConfig({...config, fortiCert: e.target.value})} placeholder="e.g. abcdef123456..." />
+          </div>
+
+          <div className="pt-4 border-t border-white/10">
+            <label className="block text-sm font-medium text-purple-300 mb-2">Tailscale Subnets</label>
+            <input type="text" className="input-glass" value={config.tailscaleSubnets} onChange={e => setConfig({...config, tailscaleSubnets: e.target.value})} placeholder="10.0.0.0/8, 192.168.1.0/24" />
+            <p className="text-xs text-slate-400 mt-2">Comma separated list of physical subnets to expose to your Tailnet.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-purple-300 mb-2">Ping Monitor Target</label>
+            <input type="text" className="input-glass" value={config.pingTarget} onChange={e => setConfig({...config, pingTarget: e.target.value})} placeholder="10.0.0.1" />
+            <p className="text-xs text-slate-400 mt-2">Internal IP address to continuously ping to verify VPN health.</p>
+          </div>
+
+          <div className="pt-6">
+            <button type="submit" disabled={saving} className="btn-primary w-full flex justify-center items-center gap-2">
+              {saving ? 'Saving & Restarting VPN...' : 'Save Configuration & Apply'}
             </button>
           </div>
         </form>

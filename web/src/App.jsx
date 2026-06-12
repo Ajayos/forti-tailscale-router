@@ -51,13 +51,13 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 text-white font-sans overflow-hidden">
+      <div className="flex min-h-screen animated-bg bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-950 to-slate-950 text-white font-sans overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <Routes>
             <Route path="/dashboard" element={<Dashboard data={data} history={history} />} />
             <Route path="/config" element={<ConfigPage />} />
-            <Route path="/system" element={<SystemPage data={data} />} />
+            <Route path="/system" element={<SystemPage data={data} uptimes={data.uptimes} />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>
