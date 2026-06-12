@@ -1,7 +1,6 @@
 import React from 'react';
 import SystemInfo from '../components/SystemInfo';
-import { Cpu, MemoryStick, Server, Box } from 'lucide-react';
-import { Cpu, Server, Activity, Globe, Database } from 'lucide-react';
+import { Cpu, MemoryStick, Server, Box, Activity, Globe, Database } from 'lucide-react';
 
 export default function SystemPage({ data, uptimes }) {
   if (!data) return null;

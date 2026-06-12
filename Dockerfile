@@ -1,10 +1,3 @@
-FROM node:20 AS build
-WORKDIR /app/web
-COPY web/package*.json ./
-RUN npm install
-COPY web/ ./
-RUN npm run build
-
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -37,7 +30,7 @@ COPY entrypoint.sh /entrypoint.sh
 COPY vpn-monitor.sh /vpn-monitor.sh
 COPY server.js /server.js
 COPY banner.sh /usr/local/bin/banner.sh
-COPY --from=build /app/web/dist /app/web/dist
+COPY web/dist /app/web/
 
 RUN chmod +x /entrypoint.sh \
  && chmod +x /vpn-monitor.sh \

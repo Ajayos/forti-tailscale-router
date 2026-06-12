@@ -116,8 +116,8 @@ app.get('/api/vpn/status', (req, res) => {
 });
 
 // --- Static Frontend ---
-app.use(express.static('./web/dist'));
-app.get('*', (req, res) => res.sendFile(path.resolve('./web/dist/index.html')));
+app.use(express.static('./web'));
+app.get('*', (req, res) => res.sendFile(path.resolve('./web/index.html')));
 
 // --- Metrics Gathering ---
 function getVpnStatus() {
