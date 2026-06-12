@@ -30,7 +30,7 @@ COPY entrypoint.sh /entrypoint.sh
 COPY vpn-monitor.sh /vpn-monitor.sh
 COPY server.js /server.js
 COPY banner.sh /usr/local/bin/banner.sh
-COPY web/dist /app/web/
+COPY public /app/public
 
 RUN chmod +x /entrypoint.sh \
  && chmod +x /vpn-monitor.sh \
