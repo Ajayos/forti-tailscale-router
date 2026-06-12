@@ -172,7 +172,7 @@ A built-in monitoring dashboard is available.
 
 Open in your browser:
 ```text
-**`https://SERVER_IP`** (or `http://SERVER_IP`)
+`https://SERVER_IP` (or `http://SERVER_IP`)
 ```
 
 **Dashboard displays:**
