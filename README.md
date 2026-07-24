@@ -129,7 +129,7 @@ docker run -d \
   -p 443:443 \
   -e FORTI_HOST=1.2.3.4 \
   -e FORTI_PORT=443 \
-  - e FORTI_USERNAME=username \
+  -e FORTI_USERNAME=username \
   -e FORTI_PASSWORD=password \
   -e FORTI_CERT=abcdef123456 \
   -e TAILSCALE_AUTHKEY=tskey-xxxxxxxx \
