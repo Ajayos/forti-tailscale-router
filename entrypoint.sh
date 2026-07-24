@@ -58,7 +58,8 @@ mkdir -p /var/lib/tailscale
 
 tailscaled \
  --state=/var/lib/tailscale/tailscaled.state \
- --socket=/run/tailscale/tailscaled.sock &
+ --socket=/run/tailscale/tailscaled.sock \
+ --tun=tailscale0 &
 
 sleep 5
 
@@ -105,6 +106,7 @@ echo "Configuring routing..."
 iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE || true
 iptables -A FORWARD -i tailscale0 -o ppp0 -j ACCEPT || true
 iptables -A FORWARD -i ppp0 -o tailscale0 -m state --state RELATED,ESTABLISHED -j ACCEPT || true
+iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu || true
 
 #################################
 # Start dashboard

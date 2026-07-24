@@ -24,6 +24,9 @@ services:
       - TAILSCALE_HOSTNAME=forti-gateway
       - TAILSCALE_SUBNETS=10.0.0.0/8,192.168.0.0/16
       - TAILSCALE_TAGS=tag:gateway
+      - TS_USERSPACE=false
+    ports:
+      - 41641:41641/udp
     volumes:
       - tailscale_data:/var/lib/tailscale
     restart: always

@@ -166,7 +166,7 @@ export default function Dashboard({ data, history }) {
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {data?.peers?.map(peer => (
-                  <div key={peer.id} className="bg-white/5 hover:bg-white/10 transition-colors border border-white/10 rounded-xl p-4 flex items-center gap-4">
+                  <div key={peer.id} className="bg-white/5 hover:bg-white/10 hover:scale-[1.02] transition-all duration-300 border border-white/10 rounded-xl p-4 flex items-center gap-4 shadow-lg hover:shadow-cyan-500/20">
                     <div className="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30">
                       {getDeviceIcon(peer.name)}
                     </div>

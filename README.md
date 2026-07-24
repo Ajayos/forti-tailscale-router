@@ -82,6 +82,8 @@ quay.io/ajayos/forti-tailscale-router
 - **Docker-based deployment**
 - **Environment variable & UI configuration** (Fully stateful persistence)
 - **Tailnet peer monitoring**
+- **Low-latency Tailscale tuning** (Direct P2P UDP, Kernel WireGuard)
+- **Automatic TCP MSS Clamping** (Fixes MTU issues)
 - **Live VPN traffic visualization** (Upload/Download & Ping graphs)
 
 ---
@@ -127,11 +129,13 @@ docker run -d \
   -p 443:443 \
   -e FORTI_HOST=1.2.3.4 \
   -e FORTI_PORT=443 \
-  -e FORTI_USERNAME=username \
+  - e FORTI_USERNAME=username \
   -e FORTI_PASSWORD=password \
   -e FORTI_CERT=abcdef123456 \
   -e TAILSCALE_AUTHKEY=tskey-xxxxxxxx \
   -e TAILSCALE_HOSTNAME=forti-exit-node \
+  -e TS_USERSPACE=false \
+  -p 41641:41641/udp \
   quay.io/ajayos/forti-tailscale-router:latest
 ```
 
@@ -152,6 +156,7 @@ The container can be configured entirely using **environment variables** on init
 | `FORTI_CERT`       | FortiGate trusted certificate fingerprint |
 | `TAILSCALE_AUTHKEY`| Tailscale authentication key              |
 | `TAILSCALE_HOSTNAME`| Node hostname in tailnet                 |
+| `TS_USERSPACE`     | Set to `false` for kernel routing (faster) |
 
 Example configuration:
 ```text
